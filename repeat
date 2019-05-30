@@ -1,0 +1,38 @@
+echo $1
+echo $2
+
+number=0
+
+if [ $1 != '' ]
+then
+
+fgt=$1
+
+if [ $2 != '' ]
+then
+    port=$2
+else
+    #port="23"
+    port="22"
+fi
+else
+
+fgt="1.2.3.4"
+#port="23"
+port="22"
+fi
+
+while [ 1 ]
+do
+
+number=$((number+1))
+
+{ echo "";  echo "config firewall address"; sleep 0.1; echo "edit Naddr_$number"; sleep 0.1; echo "set subnet 1.1.1.10/24"; sleep 0.1; echo "end"; sleep 0.1; echo "exit"; } | ssh  -t admin@$fgt 
+echo $number
+
+if [ $number -gt 10000 ]
+then
+   break
+fi
+done
+
