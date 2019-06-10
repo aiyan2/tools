@@ -54,7 +54,27 @@ docker container ls -aq
 
 
 
+curl -X POST -d '{"someparam1":"somevalue1","someparam2":"somevalue2"}' \
+-H "Content-Type: application/json" \
+-k https://120.27.68.214:8443/ejbca/webadmin \
+--cert MyClient1.pem \
+--key MyClient1.key
 
+
+docker run -it --rm -p 80:8080 -p 443:8443 -h johns-virtual-machine -e TLS_SETUP_ENABLED="simple" primekey/ejbca-ce 
+
+curl -X POST -k -H 'Content-Type: application/json' -i 'http://172.18.43.184/ejbca/ejbca-rest-api/v1/certificate/enrollkeystore' --data '{
+"username":"u1",
+"password":"1234",
+"key_alg":"RSA",
+"key_spec":"2048"
+}'
+
+
+curl -X GET "https://172.18.43.184/ejbca/ejbca-rest-api/v1/ca"
+
+
+curl https://120.27.68.214:8443/ejbca/ejbcaws/ejbcaws?wsdl  
 
 
 
