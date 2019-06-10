@@ -1,0 +1,43 @@
+# Get the CLI:
+
+root@johns-virtual-machine:/# apt install golang-go
+
+#go get github.com/google/./easypki/cmd/easypki
+
+https://godoc.org/github.com/google/easypki
+
+
+# You can also pass the following through arguments if you do not want to use
+# env variables.
+export PKI_ROOT=/tmp/pki
+export PKI_ORGANIZATION="AN.ORG"
+export PKI_ORGANIZATIONAL_UNIT=IT
+export PKI_COUNTRY=CN
+export PKI_LOCALITY="ANGLE"
+export PKI_PROVINCE="BJ"
+
+mkdir $PKI_ROOT
+
+# Create the root CA:
+./easypki create --filename root --ca "ANCA"
+
+# In the following commands, ca-name corresponds to the filename containing
+# the CA.
+
+# Create a server certificate for blog.acme.com and www.acme.com:
+./easypki create --ca-name root --dns blog.acme.com --dns www.acme.com www.acme.com
+
+# Create an intermediate CA:
+./easypki create --ca-name root --filename intermediate --intermediate "Acme Inc. - Internal CA"
+
+# Create a wildcard certificate for internal use, signed by the intermediate ca:
+./easypki create --ca-name intermediate --dns "*.internal.acme.com" "*.internal.acme.com"
+
+# Create a client certificate:
+./easypki create --ca-name intermediate --client --email bob@acme.com bob@acme.com
+
+# Revoke the www certificate.
+./easypki revoke $PKI_ROOT/root/certs/www.acme.com.crt
+
+# Generate a CRL expiring in 1 day (PEM Output on stdout):
+./easypki crl --ca-name root --expire 1
