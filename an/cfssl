@@ -1,0 +1,133 @@
+## install
+sudo  apt install golang-cfssl
+
+
+
+## dir 
+/root
+  /ca
+  /intermediate
+    /cluster
+    /development
+  /certs 
+  
+aiyan@johns-virtual-machine:~/root/ca$ more ca-sr.json
+{
+    "CN": "ANCA",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+               "C": "CN",
+               "L": "BJ",
+               "O": "AN",
+               "ST": "HAIDIAN"
+        }
+    ]
+}
+
+aiyan@johns-virtual-machine:~/root/intermediate$ more config.json
+{
+    "signing": {
+        "default": {
+            "expiry": "43800h"
+        },
+        "profiles": {
+            "cluster": {
+               "expiry": "43800h",
+               "usages": [
+                    "signing",
+                    "key encipherment",
+                    "cert sign",
+                    "crl sign",
+                    "server auth",
+                    "client auth"
+                ],
+                "ca_constraint": {
+                    "is_ca": true
+                }
+             },
+            "development": {
+             "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "key encipherment",
+                    "cert sign",
+                    "crl sign"
+                ],
+                "ca_constraint": {
+                    "is_ca": true
+                }
+            },
+            "server": {
+            "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "digital signing",
+                    "key encipherment",
+                    "server auth"
+                ]
+            },
+           "client": {
+            "expiry": "43800h",
+                "usages": [
+                    "signing",
+                    "digital signature",
+                    "key encipherment",
+                    "client auth"
+                ]
+            }
+
+        }
+    }
+}
+
+
+aiyan@johns-virtual-machine:~/root/certs$ more client.json
+{
+    "CN": "Client",
+    "hosts": [""]
+}
+server.json 
+{
+    "CN": "Server",
+    "hosts": [
+        "127.0.0.1",
+        "server.domain",
+        "sub.domain.tld"
+    ]
+}
+ 
+$ cfssl gencert -initca ca-sr.json | cfssljson -bare ca 
+
+cd intermediate
+cd development
+cfssl genkey -initca ../intermediate.json | cfssljson -bare development
+cfssl sign -ca ../../ca/ca.pem -ca-key ../../ca/ca-key.pem --config ../config.json -profile development  development.csr | cfssljson -bare development 
+
+cd ../cluster
+cfssl genkey -initca ../intermediate.json | cfssljson -bare cluster
+cfssl sign -ca ../../ca/ca.pem -ca-key ../../ca/ca-key.pem --config ../config.json -profile cluster cluster.csr | cfssljson -bare cluster 
+
+ 
+ ##At ..\certs:
+ 
+ 
+ cfssl gencert -ca=../intermediate/cluster/cluster.pem -ca-key=../intermediate/cluster/cluster-key.pem \
+    -config=../intermediate/config.json -profile=client ./client.json | cfssljson -bare client
+	
+	
+##start server 
+
+ $cfssl serve -address=localhost -port=8888           // -ca-key=test-key.pem -ca=test-cert.pem 
+
+2019/07/05 15:33:23 [INFO] Handler set up complete.
+2019/07/05 15:33:23 [INFO] Now listening on 172.18.43.184:8888
+
+
+refer:
+http://json.parser.online.fr/ 
+https://coreos.com/os/docs/latest/generate-self-signed-certificates.html   ==> TLDR 
+ 
