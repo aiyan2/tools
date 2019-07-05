@@ -1,8 +1,6 @@
 ## install
 sudo  apt install golang-cfssl
 
-
-
 ## dir 
 /root
   /ca
