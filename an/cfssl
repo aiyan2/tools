@@ -1,6 +1,8 @@
 ## install
 sudo  apt install golang-cfssl
 
+
+
 ## dir 
 /root
   /ca
@@ -124,6 +126,10 @@ cfssl sign -ca ../../ca/ca.pem -ca-key ../../ca/ca-key.pem --config ../config.js
 2019/07/05 15:33:23 [INFO] Handler set up complete.
 2019/07/05 15:33:23 [INFO] Now listening on 172.18.43.184:8888
 
+
+
+
+curl  172.18.43.184:8888/api/v1/cfssl/sign  -X POST -H "Content-Type: multipart/form-data"  -d '{"certificate_request": "-----BEGIN CERTIFICATE REQUEST-----\nMIIBUjCB+QIBADBqMQswCQYDVQQGEwJVUzEUMBIGA1UEChMLZXhhbXBsZS5jb20x\nFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xEzARBgNVBAgTCkNhbGlmb3JuaWExGDAW\nBgNVBAMTD3d3dy5leGFtcGxlLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IA\nBK/CtZaQ4VliKE+DLIVGLwtSxJgtUKRzGvN1EwI3HRgKDQ3l3urBIzHtUcdMq6HZ\nb8jX0O9fXYUOf4XWggrLk1agLTArBgkqhkiG9w0BCQ4xHjAcMBoGA1UdEQQTMBGC\nD3d3dy5leGFtcGxlLmNvbTAKBggqhkjOPQQDAgNIADBFAiAcvfhXnsLtzep2sKSa\n36W7G9PRbHh8zVGlw3Hph8jR1QIhAKfrgplKwXcUctU5grjQ8KXkJV8RxQUo5KKs\ngFnXYtkb\n-----END CERTIFICATE REQUEST-----\n"}'   
 
 refer:
 http://json.parser.online.fr/ 
