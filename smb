@@ -1,0 +1,40 @@
+smbclient
+johns@johns-virtual-machine:/tmp$ smbclient //172.18.43.216/share_enc -m SMB3 -e -W smb2016 -U u2 12345678 -c " lcd /tmp/; get loop.bat"  -d 3 
+lp_load_ex: refreshing parameters
+Initialising global parameters
+rlimit_max: increasing rlimit_max (1024) to minimum Windows limit (16384)
+Processing section "[global]"
+WARNING: The "syslog" option is deprecated
+added interface docker0 ip=172.17.0.1 bcast=172.17.255.255 netmask=255.255.0.0
+added interface ens160 ip=7.1.1.184 bcast=7.255.255.255 netmask=255.0.0.0
+Client started (version 4.7.6-Ubuntu).
+Connecting to 172.18.43.216 at port 445
+got OID=1.3.6.1.4.1.311.2.2.30
+got OID=1.2.840.48018.1.2.2
+GENSEC backend 'gssapi_spnego' registered
+GENSEC backend 'gssapi_krb5' registered
+GENSEC backend 'gssapi_krb5_sasl' registered
+GENSEC backend 'spnego' registered
+GENSEC backend 'schannel' registered
+GENSEC backend 'naclrpc_as_system' registered
+GENSEC backend 'sasl-EXTERNAL' registered
+GENSEC backend 'ntlmssp' registered
+GENSEC backend 'ntlmssp_resume_ccache' registered
+GENSEC backend 'http_basic' registered
+GENSEC backend 'http_ntlm' registered
+GENSEC backend 'krb5' registered
+GENSEC backend 'fake_gssapi_krb5' registered
+Cannot do GSE to an IP address
+Got challenge flags:
+Got NTLMSSP neg_flags=0x62898215
+NTLMSSP: Set final flags:
+Got NTLMSSP neg_flags=0x62088215
+NTLMSSP Sign/Seal - Initialising with flags:
+Got NTLMSSP neg_flags=0x62088215
+NTLMSSP Sign/Seal - Initialising with flags:
+Got NTLMSSP neg_flags=0x62088215
+the local directory is now /tmp
+dos_clean_name [\loop.bat]
+unix_clean_name [\loop.bat]
+parallel_read returned NT_STATUS_ACCESS_DENIED
+johns@johns-virtual-machine:/tmp$ 
