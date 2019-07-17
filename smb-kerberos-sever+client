@@ -1,0 +1,228 @@
+===smb keberos Server:
+#winbindd — Name Service Switch daemon for resolving names from NT servers
+in /etc/nsswitch.conf: 
+passwd: files winbind
+group:  files winbind
+In /etc/pam.d/* replace the auth lines with something like this:
+auth  required    /lib/security/pam_securetty.so
+auth  required	  /lib/security/pam_nologin.so
+auth  sufficient  /lib/security/pam_winbind.so
+auth  required    /lib/security/pam_unix.so \
+                  use_first_pass shadow nullok
+
+/etc/init.d/smbd .....	--> /usr/sbin/smbd  			  
+
+ net - Tool for administration of Samba and remote CIFS servers.				  
+# net ads testjoin 
+root@smb-virtual-machine:/home/smb# net ads info
+LDAP server: 172.18.43.216
+LDAP server name: WIN2016.SMB2016.LAB
+Realm: SMB2016.LAB
+Bind Path: dc=SMB2016,dc=LAB
+LDAP port: 389
+Server time: Mon, 15 Jul 2019 16:08:57 PDT
+KDC server: 172.18.43.216
+Server time offset: 0
+Last machine account password change: Thu, 21 Feb 2019 17:36:50 PST
+
+# net ads keytab  list
+Vno  Type                                        Principal
+  3  des-cbc-crc                                 host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+  3  des-cbc-crc                                 host/SMB-UBUNTU@SMB2016.LAB
+  3  des-cbc-md5                                 host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+  3  des-cbc-md5                                 host/SMB-UBUNTU@SMB2016.LAB
+  3  aes128-cts-hmac-sha1-96                     host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+  3  aes128-cts-hmac-sha1-96                     host/SMB-UBUNTU@SMB2016.LAB
+  3  aes256-cts-hmac-sha1-96                     host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+  3  aes256-cts-hmac-sha1-96                     host/SMB-UBUNTU@SMB2016.LAB
+  3  arcfour-hmac-md5                            host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+  3  arcfour-hmac-md5                            host/SMB-UBUNTU@SMB2016.LAB
+  3  des-cbc-crc                                 SMB-UBUNTU$@SMB2016.LAB
+  3  des-cbc-md5                                 SMB-UBUNTU$@SMB2016.LAB
+  3  aes128-cts-hmac-sha1-96                     SMB-UBUNTU$@SMB2016.LAB
+  3  aes256-cts-hmac-sha1-96                     SMB-UBUNTU$@SMB2016.LAB
+  3  arcfour-hmac-md5                            SMB-UBUNTU$@SMB2016.LAB
+
+smbd - server to provide SMB/CIFS services to clients
+ 
+#smbd  -b | grep conf 
+   CONFIGFILE: /etc/samba/smb.conf
+
+#ktutil 
+ktutil:  read_kt /etc/krb5.keytab
+ktutil:  l
+slot KVNO Principal
+---- ---- ---------------------------------------------------------------------
+   1    3  host/smb-ubuntu.smb2016.lab@SMB2016.LAB
+   2    3              host/SMB-UBUNTU@SMB2016.LAB
+
+#sudo base64 /etc/krb5.keytab 
+
+
+
+========== Client 
+# apt install krb5-user  
+will prompt to input realm, kdc, admin-server etc...
+
+vi /etc/hosts to mapping  ip and name 
+
+#kinit  u2    user(Password for u2@SMB2016.LAB: ) 
+#klist 
+
+
+smb@smb-vm:~$ smbclient //smb-ubuntu.smb2016.lab/share -m SMB3 -k -e get test.tt -d 3 
+WARNING: The "syslog" option is deprecated
+SPNEGO: Could not find a suitable mechtype in NEG_TOKEN_INIT
+session setup failed: NT_STATUS_INTERNAL_ERROR
+smb@smb-vm:~$ klist 
+klist: No credentials cache found (filename: /tmp/krb5cc_1000)
+smb@smb-vm:~$ kinit u2
+Password for u2@SMB2016.LAB: 
+smb@smb-vm:~$ klist 
+Ticket cache: FILE:/tmp/krb5cc_1000
+Default principal: u2@SMB2016.LAB
+
+Valid starting       Expires              Service principal
+2019-07-16 10:20:07  2019-07-16 20:20:07  krbtgt/SMB2016.LAB@SMB2016.LAB
+	renew until 2019-07-17 10:19:32
+smb@smb-vm:~$ smbclient //smb-ubuntu.smb2016.lab/share -m SMB3 -k -e  -c "get test.tt" -d 3 
+
+-------------
+
+root@smb-virtual-machine:/share# smbd -b | grep conf
+   CONFIGFILE: /etc/samba/smb.conf
+root@smb-virtual-machine:/share# more /etc/samba/smb.conf
+
+        [global]
+
+        workgroup = SMB2016
+        realm = SMB2016.LAB
+        netbios name = smb-ubuntu
+
+        security = ads
+        encrypt passwords = yes
+        #password server = win2016.smb2016.lab
+        kerberos method = secrets and keytab
+        dedicated keytab file = /etc/krb5.keytab
+        server string = %h server (Samba, Ubuntu)
+
+        #winbind
+        winbind use default domain = yes
+        winbind enum users = yes
+        winbind enum groups = yes
+        winbind refresh tickets = yes
+        winbind nested groups = yes
+        winbind separator = +
+
+        #idmap
+        idmap config * : backend = tdb
+        idmap config * : range = 10000 - 20000
+
+        template shell = /bin/bash
+        template homedir = /home/%D/%U
+        map to guest  = bad user
+
+
+        preferred master = no
+        dns proxy = no
+        wins server = win2016.smb2016.lab
+        wins proxy = no
+
+        #vfs objects = acl_xattr
+        map acl inherit = Yes
+
+# [home]
+#       comment = Home directories
+#       browseable = no
+#       writable = yes
+#       create mode = 0777
+#       directory mode = 0777
+#       path = /home/%D/%U
+
+[share]
+        path = /share
+        browserable = yes
+        read only= no
+
+		
+		
+++++++++
+Contents
+
+Introduction
+Active Directory
+MIT Kerberos
+User Administration
+Testing
+Introduction
+Kerberos is an authentication protocol using secret-key cryptography. There are several implementations of the Kerberos protocol used in both commercial and open-source software. This guide covers configuring the Samba server and clients to utilize Kerberos authentication services.
+
+Active Directory
+Detailed instructions for integrating Samba with Active Directory are available on the Samba wiki.
+
+The linked page gives the location of the PAM configuration files for Red Hat. In Ubuntu, the PAM configuration files are located in /etc/pam.d/ directory. The auth, account, and passwd stanzas are split into three files in Ubuntu: /etc/pam.d/common-auth for auth stanzas; /etc-pam.d/common-account for account stanzas; and /etc/pam.d/common-passwd for passwd stanzas.
+
+Ubuntu versions 9.04 (Jaunty Jackalope) and newer automatically update the PAM configuration files using the pam-auth-update utility. In previous versions, the configuration files must be edited manually.
+
+MIT Kerberos
+Instructions for installing and configuring MIT Kerberos are available on its wiki page. Samba is just another service to Kerberos, so to allow Samba to authenticate users via Kerberos, simply generate a principal for the Samba server, place the service key in a keytab, and configure Samba to use it.
+
+The name of this principal must take the form cifs/server.example.com@EXAMPLE.REALM, and the encryption type must be rc4-hmac:normal.
+
+Here is a step-by-step guide:
+
+1. Launch the kadmin utility as the realm administrator or as a user authorized to add principals:
+
+$ kadmin -p admin/admin
+2. In the kadmin interface, issue the following command:
+
+kadmin: addprinc -randkey cifs/server.example.com
+A message indicating the principal cifs/server.example.com@EXAMPLE.REALM should be displayed.
+
+3. Generate a keytab for the new principal:
+
+kadmin: ktadd -k /path/to/keytab -e rc4-hmac:normal cifs/server.example.com
+Make sure to include the encryption type. The default encryption type is not compatible with the Samba client utilities.
+
+4. Securely copy the keytab to /etc/krb5.keytab on the server that will be running Samba.
+
+5. Make sure only the root user can access the keytab:
+
+$ chown root:root /etc/krb5.keytab
+$ chmod 0600 /etc/krb5.keytab
+6. Edit the smb.conf file (located in /etc/samba/ by default) as indicated below:
+
+
+...
+security = ADS
+realm = KERBEROS_REALM
+encrypt passwords = yes
+#Samba 3.0 requires "kerberos keytab = yes" instead of the next line.
+#Samba < 3.5 might require "kerberos method = system keytab" instead of the next line.
+kerberos method = secrets and keytab
+#optional
+password server = kdc.fdqn
+...
+The password server option is only required if you intend to use a password server other than the one configured in /etc/krb5.conf. 
+
+7. Restart Samba:
+
+$ sudo /etc/init.d/samba restart
+User Administration
+Add users to the Kerberos database using the kadmin interface:
+
+kadmin: addprinc <username>[@REALM.NAME]
+The realm name is optional in properly configured Kerberos environments.
+
+You will be prompted to enter a password for the user. Once a user is added you should be able to acquire Ticket-Granting Tickets with kinit from any system that is configured to authenticate using your Kerberos domain. See the Kerberos page for more details.
+
+Note that Samba maps authenticated users to a system users. This means that if you add a user to the Kerberos database that does not exist as a system user, you will not be able to authenticate using your Kerberos credentials until a user of the same name is added as a system user. See AddUsersHowto for details on adding users. Other options such as pulling user information from LDAP are possible, but outside the scope of this guide.
+
+The existence of a user can be checked with this command:
+
+$ id <username>
+Testing
+
+$ kinit <Kerberos username>
+$ smbclient -k -L //server/
+If all is well, a listing of active shares will be displayed.		
