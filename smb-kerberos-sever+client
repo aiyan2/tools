@@ -1,3 +1,41 @@
+smbtest.sh 
+
+#!/bin/bash
+
+SMB2016="//172.18.43.216/share"
+SMB2016_ENC=$SMB2016"_enc"
+UAuth="-U u1 12345678 " 
+
+TIMER=5
+
+#CURL="curl --proxy-ntlm --proxy-user u1:12345678 -x 172.18.43.34:8080 -k"
+#CURL="curl --proxy-user adu2:12345678 -x 172.18.43.201:8080 -k"
+
+SMBCLT="smbclient -t 10 "$SMB2016" -W smb2016  -e "$UAuth
+# kinit %User; klist to make sure kgt dose present and not expire ..
+#SMBCLT_KRB ="smbclient -t 30 -e -k " 
+ 
+#while true; do 
+
+   $SMBCLT -c " get eicar.com " 
+      sleep $TIMER
+   $SMBCLT -c " get loop.bat " 
+      sleep $TIMER
+   $SMBCLT -c " get notes.txt " 
+      sleep $TIMER
+  
+SMBCLT="smbclient -t 10 "$SMB2016_ENC" -W smb2016  -e "$UAuth
+  
+   $SMBCLT -c " get eicar.com " 
+      sleep $TIMER
+   $SMBCLT -c " get loop.bat " 
+      sleep $TIMER
+   $SMBCLT -c " get win.ini " 
+      sleep $TIMER
+#done
+
+
+
 ===smb keberos Server:
 #winbindd — Name Service Switch daemon for resolving names from NT servers
 in /etc/nsswitch.conf: 
