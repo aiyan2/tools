@@ -1,1 +1,4 @@
 
+ ### send email
+ swaks --server 172.18.43.124  --from u1@devqa.lab --to u2@devqa.lab  --header "Subject: mantis " --body "test" --attach lo\ op.bat 
+ 
