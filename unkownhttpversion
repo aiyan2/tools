@@ -1,0 +1,71 @@
+Unknown http version test 
+
+Supported version: 0.9, 1.0, 1.1 
+
+Client and Server Request:
+
+WebServer:Can support any http version:
+Client: Can send support and un-supported http version protocol 
+
+Server: by python: Support 0.1-1.9
+
+Client: by NC: 
+
+direct connection:
+#printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc 172.18.43.184 8005 -v
+via web-proxy<FGT>
+#printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc <FGT> <port> -v 
+
+Connection to 172.18.43.184 8005 port [tcp/*] succeeded!
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.6.8
+Date: Thu, 05 Sep 2019 17:46:29 GMT
+
+Hello, world!
+
+
+====Server Code 
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from io import BytesIO
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'Hello, world!\r\n')
+
+httpd = HTTPServer(('0.0.0.0', 8005), SimpleHTTPRequestHandler)
+httpd.serve_forever()
+
+
+
+=====Result 
+
+1) best-effort:
+johns@johns-virtual-machine:~/https$ printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc 172.18.43.33 8080 -v
+Connection to 172.18.43.33 8080 port [tcp/http-alt] succeeded!
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.6.8
+Date: Thu, 05 Sep 2019 18:09:32 GMT
+Connection: close
+
+Hello, world!
+2) Reject
+johns@johns-virtual-machine:~/https$ printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc 172.18.43.33 8080 -v
+Connection to 172.18.43.33 8080 port [tcp/http-alt] succeeded!
+HTTP/1.0 505 HTTP Version Not Supported
+Connection: close
+Content-Type: text/html
+Cache-Control: no-cache
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Content-Security-Policy: frame-ancestors
+Content-Length: 1644
+....
+
+3) tunnel 
+
+johns@johns-virtual-machine:~/https$ printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc 172.18.43.33 8080 -v
+Connection to 172.18.43.33 8080 port [tcp/http-alt] succeeded!
