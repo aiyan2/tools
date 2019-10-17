@@ -1,0 +1,19 @@
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.NtlmPasswordAuthentication;
+   
+        byte[] buf = new byte[16 * 1024 * 1024];;
+        int len=0;
+        String url = "smb://192.168.1.1/Elements/README.txt";
+        NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(null, "login", "pwd");
+        SmbFile smbFile = new SmbFile(url, auth);
+        File file = new File("C:\\Users\\ralad\\README.txt");
+        file.createNewFile();
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        SmbFileInputStream smbFileInputStream = new SmbFileInputStream(smbFile);
+        while ((len = smbFileInputStream.read(buf)) > 0) {
+                fileOutputStream.write(buf, 0, len);
+        }
+        smbFileInputStream.close();
+        fileOutputStream.close();
