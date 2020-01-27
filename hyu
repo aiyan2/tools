@@ -1,0 +1,16 @@
+echo on
+set m1="https://check.torproject.org/cgi-bin/TorBulkExitList.pyip=1.1.1.1"
+set m2="https://www.badips.com/get/list/any/2"
+set m3="https://talosintelligence.com/documents/ip-blacklist"
+set m4="http://blocklist.greensnow.co/greensnow.txt"
+
+
+curl %m1% -o m1.f 
+curl %m2% -o m2.f
+curl %m3% -o m3.f
+curl %m4% -o m4.f 
+
+certutil -hashfile m1.f md5 
+certutil -hashfile m2.f md5 
+certutil -hashfile m3.f md5 
+certutil -hashfile m4.f md5 
