@@ -6,6 +6,8 @@
 ######## CLIENT
 # curl aws-elastic-ip     # also the port1 of FGT public-ip, or private-ip of port1
 
+###### fix the nohup not-working: 
+#nohup python3 -u myweb.py &
 
 #!/usr/bin/env python3
 
