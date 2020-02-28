@@ -23,8 +23,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         #content_str = 'Hello,EARTH!\r\nFrom:\t'
         #content_str = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
-
-        content_str = subprocess.check_output('hostname -I', shell=True).decode('utf-8')
+        # hostname -I to get the local IP, but '-I' is not supported by windows
+        content_str = subprocess.check_output('hostname ', shell=True).decode('utf-8')
         content = content_str.encode();  # convert to byte      
         self.send_header('Content-Length',len(content_str))
         self.send_header('Content-type', 'text/html')
