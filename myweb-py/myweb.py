@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
+```
+
+```
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from http import cookies
 import socket 
 from io import BytesIO
 import ssl
-
+"""
+2020-01-22: adding cookie
+2020-01-20: adding get client hostname ( run local command) : for LDB load balance
+"""
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
-        #content_str = 'Hello, Fortinet!\r\n'
-        content_str = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
-		content_str += subprocess.check_output('hostname -I', shell=True).decode('utf-8')	
+        content_str = 'Hello, Fortinet!\r\n'
+        #content_str = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
+	content_str += subprocess.check_output('hostname -I', shell=True).decode('utf-8')	
         content = content_str.encode();  # convert to byte   
        
         self.send_header('Content-Length',len(content_str))
