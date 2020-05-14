@@ -7,7 +7,10 @@ import ssl
 import argparse
 import subprocess
 
+__version__ = 1.1
+
 class MyHandler(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
 
     def do_GET(self):
         self.send_response(200)
@@ -48,14 +51,14 @@ parser.add_argument('--ssl',
     action='store_true',
     help='ssl?' )
 
-parser.add_argument('--port', default=8080, type=int)
-
+parser.add_argument('--port',
+                    default=8080,
+                    type=int)
 args = parser.parse_args()
 
 myport=int(args.port)
 
-
-
+#start servers
 if not(args.ipv6):
     print ('# http  ipv4 on port:'+str(myport))
     httpd = HTTPServer(('0.0.0.0', myport),MyHandler)
