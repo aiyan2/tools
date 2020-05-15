@@ -63,7 +63,7 @@ if not(args.ipv6):
     print ('# http  ipv4 on port:'+str(myport))
     httpd = HTTPServer(('0.0.0.0', myport),MyHandler)
     if args.ssl:        
-        httpd.socket = ssl.wrap_socket (httpds.socket, keyfile='key.pem', 
+        httpd.socket = ssl.wrap_socket (httpd.socket, keyfile='key.pem', 
             certfile='cert.pem', server_side=True)
        
     httpd.serve_forever()
