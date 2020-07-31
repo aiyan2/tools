@@ -23,3 +23,7 @@ done
 
 #{ echo "";  echo "config firewall address"; sleep 0.1; echo "edit Naddr_$number"; sleep 0.1; echo "set subnet 1.1.1.10/24"; sleep 0.1; echo "end"; sleep 0.1; echo "exit"; } | ssh  -t admin@$fgt 
  
+#0731/2020: clone 20K policies , need sleep 0.1 :-)
+
+#{ echo "";  echo "config firewall policy"; sleep 0.1; echo "clone 1 to $number "; sleep 0.1; echo "end"; sleep 0.1; echo "exit"; } | ssh -tt admin@$fgt
+ 
