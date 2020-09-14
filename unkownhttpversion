@@ -1,4 +1,4 @@
-Unknown http version test 
+====Unknown http version test 
 
 Supported version: 0.9, 1.0, 1.1 
 
@@ -65,7 +65,14 @@ Content-Security-Policy: frame-ancestors
 Content-Length: 1644
 ....
 
-3) tunnel 
+3) when in  tunnel  ( fgt config, not proxy-tunnel) 
 
 johns@johns-virtual-machine:~/https$ printf "GET /index.html HTTP/0.1\r\nHost: 172.18.43.184:8005\r\n\r\n"|nc 172.18.43.33 8080 -v
 Connection to 172.18.43.33 8080 port [tcp/http-alt] succeeded!
+
+===== nc proxy example
+
+ printf "GET / HTTP/1.0\r\nHost: zz\r\n\r\n" | nc -X connect -x 172.18.43.64:8080 172.18.2.169 80
+ printf "GET /index.html HTTP/1.1\r\nHost: 172.18.2.169\r\n\r\n"|nc <<SUBNET>>.34 8080
+ 
+ while true; do { echo -e 'HTTP/1.1 200 OK\r\n'} | nc -l 8909; done; 
