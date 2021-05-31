@@ -1,0 +1,18 @@
+tep 2 – Execute the Shell Script
+ 
+Starting Directory: /FortiGate5101C
+ 
+The script execution examples below requires a password and host check user interaction.
+ 
+Without VDOMs:
+ 
+(sleep 1; while [ 1 ]; do ./Script/script-fg-spm.sh ; done) | ssh -t -t admin@10.100.23.40 > FG5101C-Monitor.txt
+ 
+With VDOMs:
+ 
+(echo config global; sleep 1; while [ 1 ]; do ./Script/script-fg-spm.sh ; done) | ssh -t -t admin@10.100.23.40 > FG5101C-Monitor.txt
+ 
+ 
+Install sshpass to execute the script in a non-interactive mode without entering the password every time.
+
+( Source: https://kb.fortinet.com/kb/documentLink.do?externalID=FD34839) 
