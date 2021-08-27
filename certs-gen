@@ -1,0 +1,21 @@
+#!/bin/bash
+PREFIX_NAME="NGFW"
+DOMAIN="devqa.lab"
+SUBJ_PREFIX="/C=ZOO/ST=MAMO/L=FEREA/O=TIGGER/OU=TG-A/"
+CERT_LIST=("samlsp:mysp" "samlidp:myidp")
+CA_FNAME=${PREFIX_NAME}CA
+# CA
+echo "Generate the CA file key ..."
+openssl genrsa -out ${CA_FNAME}.key 2048
+echo "Generate the CA cert ..."
+openssl req -new -x509 -days 3650 -key ${CA_FNAME}.key -out ${CA_FNAME}.crt -subj $SUBJ_PREFIX"CN=${DOMAIN}"
+# Certificates for IdP and SP
+for cert in "${CERT_LIST[@]}"; do
+ name="${cert%%:*}"
+ cn="${cert##*:}"
+ echo "Generate key and cert for $name CN=$cn"
+ openssl genrsa -out ${name}.key 2048
+ openssl req -new -sha256 -key ${name}.key -subj $SUBJ_PREFIX"CN=${cn}" -out ${name}.csr
+ # if days<0, then expired certs
+ openssl x509 -req -in ${name}.csr -CA ${CA_FNAME}.crt -CAkey ${CA_FNAME}.key -CAcreateserial -out ${name}.crt -days 1825 -sha256
+done
