@@ -1,12 +1,9 @@
 #! /bin/bash
 
 #################################################
+# How to run
+# ./fgt_monitor.sh | ssh -t -t admin@172.18.43.67 >tt.log
 #
-# Site: ET201
-# Serial: FG101ETK18003177
-# Hostname: JTIET201FGT01
-# Wad: 3 workers
-# 
 ##################################################
 
 # General infos
