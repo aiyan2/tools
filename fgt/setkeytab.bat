@@ -1,0 +1,33 @@
+timeout 1
+echo config firewall profile-protocol-options
+echo edit krb
+echo config cifs
+echo config server-keytab
+
+timeout 1
+echo edit host/win2016@smb2016
+echo set keytab "BQIAAABHAAIAB3NtYjIwMTYABGhvc3QAB3dpbjIwMTYAAAABYjyHexAAEgAgvBskSRUAX4qR38vo4qpNkvgrK+LWQyIT9RYqVa1Fkr8AAAA3AAIAB3NtYjIwMTYABGhvc3QAB3dpbjIwMTYAAAABYjyHexAAEQAQlFdlO9TLv0oqV5qLlPHJTAAAAC8AAgAHc21iMjAxNgAEaG9zdAAHd2luMjAxNgAAAAFiPId7EAADAAjsxyWG9x/l4w=="
+
+timeout 2 
+echo end
+echo end
+echo end
+timeout 1
+
+echo execute log filter category 19
+echo execute log delete
+echo y
+
+timeout 1
+echo config user krb-keytab
+echo edit  http-fgt34
+
+echo set keytab "BQIAAAA5AAIACURFVlFBLkxBQgAEaHR0cAAPZmd0MzQuZGV2cWEubGFiAAAAAQAAAAAKAAEACC89XWuSIOwyAAAAOQACAAlERVZRQS5MQUIABGh0dHAAD2ZndDM0LmRldnFhLmxhYgAAAAEAAAAACgADAAgvPV1rkiDsMgAAAEEAAgAJREVWUUEuTEFCAARodHRwAA9mZ3QzNC5kZXZxYS5sYWIAAAABAAAAAAoAFwAQJZdFyxI6UqouaTqqzKLbUgAAAFEAAgAJREVWUUEuTEFCAARodHRwAA9mZ3QzNC5kZXZxYS5sYWIAAAABAAAAAAoAEgAgla8Uw7RL+h+v/IIsa7sq/SrxXkCW18RHSMViX7xAK0QAAABBAAIACURFVlFBLkxBQgAEaHR0cAAPZmd0MzQuZGV2cWEubGFiAAAAAQAAAAAKABEAEBYajv3HS2kxjZaph443Exo="
+echo end
+timeout 3
+echo diagnose test  application wad 99 
+
+
+echo exit 
+
+
