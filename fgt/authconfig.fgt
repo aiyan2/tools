@@ -1,0 +1,247 @@
+config user ldap
+    edit "ldap166"
+        set server "172.18.43.166"
+        set cnid "cn"
+        set dn "cn=users,dc=devqa,dc=lab"
+        set type regular
+        set username "ldapadmin"
+        set password 12345678
+    next
+    edit "ldap124"
+        set server "172.18.43.124"
+        set cnid "cn"
+        set dn "dc=devqa,dc=lab"
+        set type regular
+        set username "ldapadmin"
+        set password 12345678
+    next
+    edit "ldap116"
+        set server "172.18.43.116"
+        set cnid "cn"
+        set dn "dc=devqa2016,dc=local"
+        set type regular
+        set username "u1"
+        set password 12345678
+    next
+    edit "ldap216"
+        set server "172.18.43.216"
+        set cnid "cn"
+        set dn "cn=users,dc=smb2016,dc=lab"
+        set type regular
+        set username "u1"
+        set password 12345678
+    next
+end
+
+config user domain-controller
+    edit "dc166"
+        set ip-address 172.18.43.166
+        set domain-name "devqa.lab"
+        set ldap-server "ldap166"
+    next
+    edit "216-agentless"
+        set ip-address 172.18.43.216
+        set domain-name "smb2016.lab"
+        set ldap-server "ldap216"
+    next
+end
+
+config user radius
+    edit "vm-122"
+        set server "172.18.43.122"
+        set secret ENC GV/971yXYdlXzAOINDd8Gu02QbMLAooiYP7cdp5V1RPe6oqLxJ74BgGR6juDG2GaQMM+drb05L88iQkpmMyNAJvdyqIzfXlVC97cbf6xcxHg9CBsqn+c7BvwowN/k2JVRYgJ8/9mjbFZdi0eX6lib2nE0GPiRUM4bTCbe2KjaCV5rRpt0f9AJ1DrirBcdg/yMMp1EQ==
+    next
+end
+config user local
+     edit "lu1"
+        set type password      
+        set passwd 12345678
+    next
+    edit "adu2@DEVQA.LAB"
+        set type ldap
+        set ldap-server "ldap166"
+    next
+    edit "Adu3"
+        set type ldap
+        set ldap-server "ldap124"
+    next
+end
+
+config user group
+  edit "fsso166"
+        set group-type fsso-service
+        set member "CN=11,CN=USERS,DC=DEVQA,DC=LAB"
+    next
+    edit "grp124+166"
+        set member "ldap124" "ldap166"
+        config match
+            edit 1
+                set server-name "ldap124"
+                set group-name "CN=Distributed COM Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 2
+                set server-name "ldap124"
+                set group-name "CN=Domain Users,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 3
+                set server-name "ldap124"
+                set group-name "CN=Performance Log Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 4
+                set server-name "ldap124"
+                set group-name "CN=Performance Monitor Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 5
+                set server-name "ldap124"
+                set group-name "CN=Protected Users,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 6
+                set server-name "ldap124"
+                set group-name "CN=Remote Desktop Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 7
+                set server-name "ldap124"
+                set group-name "CN=Remote Management Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 8
+                set server-name "ldap124"
+                set group-name "CN=Users,CN=Builtin,DC=devqa,DC=lab"
+            next
+            edit 9
+                set server-name "ldap124"
+                set group-name "CN=WinRMRemoteWMIUsers__,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 10
+                set server-name "ldap166"
+                set group-name "CN=Domain Users,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 11
+                set server-name "ldap166"
+                set group-name "CN=Protected Users,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 12
+                set server-name "ldap166"
+                set group-name "CN=WinRMRemoteWMIUsers__,CN=Users,DC=devqa,DC=lab"
+            next
+        end
+    next
+    edit "local_grp"
+        set member "lu1"
+    next
+    edit "grp_216"
+        set member "ldap216"
+        config match
+            edit 1
+                set server-name "ldap216"
+                set group-name "CN=Domain Users,CN=Users,DC=SMB2016,DC=LAB"
+            next
+        end
+    next
+
+    edit "fsso-166_grp"
+        set group-type fsso-service
+        set member "CN=DOMAIN USERS,CN=USERS,DC=DEVQA,DC=LAB"
+    next
+    edit "radius_grp"
+        set member "vm-122"
+        config match
+            edit 1
+                set server-name "vm-122"
+                set group-name "devqa"
+            next
+        end
+    next
+    edit "grp_166"
+        set member "ldap166"
+        config match
+            edit 1
+                set server-name "ldap166"
+                set group-name "CN=Domain Users,CN=Users,DC=devqa,DC=lab"
+            next
+            edit 2
+                set server-name "ldap166"
+                set group-name "CN=Domain Admins,CN=Users,DC=devqa,DC=lab"
+            next
+        end
+    next
+    
+end
+
+config user fsso
+    edit "fsso166"
+        set server "172.18.43.166"
+        set password 888888
+    next
+end
+
+config user fsso
+    edit "fss0123"
+        set server "172.18.43.123"
+        set password 888888
+    next
+end
+
+config user krb-keytab
+    edit "http-fgt34"
+        set pac-data disable
+        set principal "http/fgt34.devqa.lab@DEVQA.LAB"
+        set ldap-server "ldap166"
+        set keytab "BQIAAAA5AAIACURFVlFBLkxBQgAEaHR0cAAPZmd0MzQuZGV2cWEubGFiAAAAAQAAAAAKAAEACC89XWuSIOwyAAAAOQACAAlERVZRQS5MQUIABGh0dHAAD2ZndDM0LmRldnFhLmxhYgAAAAEAAAAACgADAAgvPV1rkiDsMgAAAEEAAgAJREVWUUEuTEFCAARodHRwAA9mZ3QzNC5kZXZxYS5sYWIAAAABAAAAAAoAFwAQJZdFyxI6UqouaTqqzKLbUgAAAFEAAgAJREVWUUEuTEFCAARodHRwAA9mZ3QzNC5kZXZxYS5sYWIAAAABAAAAAAoAEgAgla8Uw7RL+h+v/IIsa7sq/SrxXkCW18RHSMViX7xAK0QAAABBAAIACURFVlFBLkxBQgAEaHR0cAAPZmd0MzQuZGV2cWEubGFiAAAAAQAAAAAKABEAEBYajv3HS2kxjZaph443Exo="
+    next
+end
+
+
+config authentication scheme
+    edit "ldap"
+        set method basic
+        set user-database "ldap124" "ldap166" "ldap216"
+    next
+   
+    edit "fsso"
+        set method fsso
+    next
+    edit "krb"
+        set method negotiate
+        set negotiate-ntlm disable
+        set kerberos-keytab "http-fgt34"
+    next
+    edit "digest"
+        set method digest
+        set user-database "local-user-db"
+    next
+    edit "ntlm-agent"
+        set method ntlm
+        set fsso-agent-for-ntlm "fsso166"
+    next
+  edit "ntlm-agentless"
+        set method ntlm
+        set domain-controller "dc166"
+    next
+    edit "radius"
+        set method basic
+        set user-database "vm-122"
+    next
+  edit "krb+ntlm"
+        set method negotiate
+        set kerberos-keytab "http-fgt34"
+        set domain-controller "dc166"
+    next
+    edit "local_only"
+        set method basic
+        set user-database "local-user-db"
+    next
+    edit "form"
+        set method form
+        set user-database "ldap216" "local-user-db" "ldap124"
+    next
+end
+
+config authentication rule
+    edit "1"
+        set srcaddr "all"
+        set ip-based disable
+        set active-auth-method "ldap"
+    next
+end
+
+
