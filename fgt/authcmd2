@@ -1,0 +1,111 @@
+#!/bin/bash
+pc100=172.18.43.100
+waduserlist="diagnose wad user list"
+(   
+    echo open "$fgt"
+    sleep 1
+    echo "admin"
+    sleep 1
+    echo ""
+    sleep 1
+    echo "config firewall proxy-policy"
+    sleep 2
+    echo "edit 1"
+    sleep 2
+     echo  set groups grp124+166
+      
+    sleep 2    
+    echo "end"
+
+  echo config auth rule
+    sleep 2
+    echo edit 1
+    sleep 2
+echo  set active-auth-method ldap 
+sleep 2 
+echo  next
+sleep 2
+echo  end
+) | telnet
+
+sleep 5
+
+echo ====mmmmm  LDAP
+curl -k -x  $src_gateway:8080  https://$pc100 -U adu2:12345678 2>&1
+
+(   
+    echo open "$fgt"
+    sleep 1
+    echo "admin"
+    sleep 1
+    echo ""
+    sleep 1
+  echo $waduserlist 
+  echo config auth rule
+    sleep 2
+  echo edit 1
+  sleep 2
+  echo set active-auth-method ntlm-agentless
+	sleep 2 
+ echo next 
+ sleep 2
+ echo end
+) | telnet
+
+sleep 5 
+echo ====mmmmm  ntlm-less
+curl -k -x  $src_gateway:8080  https://$pc100  --proxy-ntlm -U adu2:12345678  2>&1
+
+
+(   
+    echo open "$fgt"
+    sleep 1
+    echo "admin"
+    sleep 1
+    echo ""
+    sleep 1
+  echo $waduserlist  ### user for pervious
+  
+   sleep 2
+    echo "config firewall proxy-policy"
+    sleep 1
+    echo "edit 1"
+    sleep 2
+echo set groups radius_grp
+    sleep 2 
+echo end
+
+  echo config auth rule
+      sleep 2
+    echo edit 1
+      sleep 2
+ echo set active-auth-method radius
+
+ sleep 2 
+ echo end
+  ) | telnet
+
+sleep 5 
+echo ====mmmmm  radius
+curl -k -x  $src_gateway:8080  https://$pc100  --proxy-user grptest:fortinet   2>&1
+
+
+
+===== wrap-up  
+(   
+    echo open "$fgt"
+    sleep 1
+    echo "admin"
+    sleep 1
+    echo ""
+echo $waduserlist	
+     sleep 2
+    echo "config firewall proxy-policy"
+    sleep 1
+    echo "edit 1"
+    sleep 2
+echo unset groups 
+    sleep 2 
+echo end
+) | telnet
+
