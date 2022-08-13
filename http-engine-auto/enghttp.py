@@ -19,14 +19,12 @@ class Configurations(object):
 
     def __init__(self):
         self.connections = []
-        self.sessions = []
-        self.trees = []
         self.tmp_pars = '' # tmp storage 
 
     def add_connection(self, connection):
         self.connections.append(connection)
 
-   
+
 def generate_random_data(length_range):
     def random_string(length):
         alphabet = string.ascii_letters
@@ -71,37 +69,48 @@ def auth_map(conf,tuple):
     return user    
 ##@todo: other auth to be implimented 
 
-def handle_get(conf, tuple):
-    conf.uri = args.uri
-    if tuple['type'] == DataTuple.GET: 
-        conf.uri += tuple['file_id']
 
-    pars = "" 
-    try: 
-        if tuple['output'] == 1:
-            pars = ' -o /tmp/http_get_big ' 
-        if tuple['web_filter'] == 1:            
-            conf.uri = "www.ibm.com"
-           
-    except KeyError as e:  # ignore it as not all key present at each tuple 
-        print ("missing key:")
-        print (e)
-        pass        
-    
-    pars += conf.uri+" "+ver_map(conf)+conf.tmp_pars
-    print ("conf.tmp_pars"+conf.tmp_pars)  
+def handle_run(conf,tuple):
+    pars = conf.uri+" "+ver_map(conf)+conf.tmp_pars
     if conf.proxy:
         pars +=" -x " +conf.proxy 
         pars += auth_map(conf, tuple)+ conf.username +":"+conf.password 
     print ("curl -k "+pars);
 
-    p = subprocess.Popen("curl -v -k  "+pars, stdout=subprocess.PIPE, shell=True)
+    p = subprocess.Popen("curl -k  "+pars, stdout=subprocess.PIPE, shell=True)
     print(p.communicate())
 
     # curl -x 172.18.43.67:8080 https://172.18.43.100 --proxy-user u1:12345678
     # curl -v https://www.cnn.com -k --http1.1  -d /etc/hosts -x 172.18.43.67:8080 --proxy-user u3:12345678
     # smb@krb5:~/enghttp/mt$ python3 enghttp.py --uri https://172.18.43.100  --username u1 --password 12345678 --data-tuples pc100tuple.txt  --proxy 172.18.43.67:8080
 
+
+def handle_get(conf, tuple):
+    conf.uri = args.uri
+    conf.uri += tuple['file_id'] # add file_id to get  
+    conf.tmp_pars = ""  
+    
+    ### MUST try and catch it one by one otherwise
+    
+    try:  
+        if tuple['output'] == 1:
+            conf.tmp_pars = ' -o /tmp/http_get_big '        
+    except KeyError as e:  
+        print ("missing key:")
+        print (e)
+        pass  
+
+    try:  
+        if tuple['web_filter'] == 1:            
+            conf.uri = "https://www.ibm.com"
+    except KeyError as e:  
+        print ("missing key:")
+        print (e)
+        pass  
+        
+    finally:
+        handle_run(conf,tuple)    
+        
 def handle_post(conf, tuple):
     mfile = tuple['file_id']
     print("file is:"+mfile + "& tuple['form_urlencode']")
@@ -110,9 +119,10 @@ def handle_post(conf, tuple):
         pars = " -F file=@"+mfile
     else:
         pars = " -d "+mfile 
-    conf.tmp_pars = pars  
     
-    handle_get(conf, tuple)    
+
+    conf.tmp_pars = pars      
+    handle_run(conf, tuple)    
 
 def process_data_tuple(conf, tuple):
     type = tuple['type']
