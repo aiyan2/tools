@@ -6,15 +6,17 @@ import argparse
 import os
 import json
 import sys
-
 import subprocess 
+#import unittest
+
+#@todo: add py unitest frame work with assert: 
 
 class DataTuple(object):
 # http request type
     GET = 0
     POST = 1
 
-
+    
 class Configurations(object):
 
     def __init__(self):
@@ -23,6 +25,17 @@ class Configurations(object):
 
     def add_connection(self, connection):
         self.connections.append(connection)
+
+def mlog (obj):
+    print (obj)
+def assertIn (a , b ):
+    #removing newlines
+    
+    if a in b.strip():
+        mlog("\n\n\n@@@@@@@@PASSPASS@@@@@@\n\n\n")
+    else:
+        mlog("\n\n\n@@@@@@@@FAILFAIL@@@@@@\n\n\n")
+
 
 
 def generate_random_data(length_range):
@@ -69,17 +82,37 @@ def auth_map(conf,tuple):
     return user    
 ##@todo: other auth to be implimented 
 
+#def test_check(tuple):
 
-def handle_run(conf,tuple):
+def test_run(conf,tuple):
     pars = conf.uri+" "+ver_map(conf)+conf.tmp_pars
     if conf.proxy:
         pars +=" -x " +conf.proxy 
         pars += auth_map(conf, tuple)+ conf.username +":"+conf.password 
     print ("curl -k "+pars);
 
-    p = subprocess.Popen("curl -k  "+pars, stdout=subprocess.PIPE, shell=True)
-    print(p.communicate())
+    p = subprocess.Popen("curl -k  "+pars + " 2>&1", stdout=subprocess.PIPE, shell=True)
+    out, err = p.communicate()
+    
+    if p.returncode != 0:
+        return None
+        
+    mlog (out)
 
+    #fields = out.split()
+    # strand = ''.join(fields)
+    #aln = Aln(int(fields[1]), int(fields[2]), fields[3].decode(), int(fields[4]), int(fields[5]))
+    # print ( strand)
+
+    try:  
+        assertIn(tuple['expect'],out.decode())         
+    except KeyError as e:  
+        print ("missing key:")
+        print (e)
+        pass  
+
+   
+    
     # curl -x 172.18.43.67:8080 https://172.18.43.100 --proxy-user u1:12345678
     # curl -v https://www.cnn.com -k --http1.1  -d /etc/hosts -x 172.18.43.67:8080 --proxy-user u3:12345678
     # smb@krb5:~/enghttp/mt$ python3 enghttp.py --uri https://172.18.43.100  --username u1 --password 12345678 --data-tuples pc100tuple.txt  --proxy 172.18.43.67:8080
@@ -109,7 +142,8 @@ def handle_get(conf, tuple):
         pass  
         
     finally:
-        handle_run(conf,tuple)    
+        test_run(conf,tuple)
+        conf.uri = args.uri    
         
 def handle_post(conf, tuple):
     mfile = tuple['file_id']
@@ -122,7 +156,7 @@ def handle_post(conf, tuple):
     
 
     conf.tmp_pars = pars      
-    handle_run(conf, tuple)    
+    test_run(conf, tuple)    
 
 def process_data_tuple(conf, tuple):
     type = tuple['type']
@@ -181,22 +215,37 @@ if __name__ == '__main__':
 
 """
 smb@krb5:~/enghttp/mt$ python3 enghttp.py --uri https://172.18.43.100  --username u1 --password 12345678 --data-tuples pc100tuple.txt  --proxy 172.18.43.67:8080 > log
-{"http-get": {"connection_id":0, "session_id":0, "tree_id":0, "compound":1, "type":0, "file_id":"/", "range":"none", "output":0},
 
- "http-get-av": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/eicar.com.1",  "range":"none", "output":0},
- 
- "http-post-multipart": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1, "form_urlencode":0, "file_id":"./enghttp.py", "range":"none", "output":0},
- 
- "http-get-big": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/test/4m",  "range":"none", "output":1},
- 
- "http-webfilter": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/",  "web_filter":1, "output":0},
- 
- "http-post-form": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1,  "form_urlencode":1, "file_id":"/etc/hosts", "range":"none", "output":0}, 
- 
- "http-post-av": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1, "form_urlencode":1, "file_id":"./eicar.com.1", "range":"none", "output":0},
- 
- "http-post-big": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1,  "form_urlencode":1, "file_id":"./10g", "range":"none", "output":0}
+
+{
+ "http-get": {"connection_id":0, "session_id":0, "tree_id":0, "compound":1, "type":0, "file_id":"/", "range":"
+none","expect":"Hello"},
+
+ "http-get-av": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/eicar.co
+m.1",  "range":"none","expect":"infected with the virus" },
+
+ "http-get-big": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/test/64
+m",  "range":"none", "output":1, "expect":"64.0M"},
+
+
+ "http-webfilter": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/",  "
+web_filter":1,"expect":"FortiGuard Intrusion Prevention - Access Blocked" },
+
+ "http-file-filter": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":0,  "file_id":"/tes
+t/echo.bat",  "expect":" blocked due to its file type " },
+
+ "http-post-form": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1,  "form_urlencode":
+1, "file_id":"/etc/hosts", "range":"none" ,"expect":"Hello" },
+
+ "http-post-multipart": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1, "form_urlenco
+de":0, "file_id":"./enghttp.py", "range":"none","expect":"Hello"},
+
+
+ "http-post-big": {"connection_id":0, "session_id":0, "tree_id":0, "compound":0, "type":1,  "form_urlencode":1
+, "file_id":"./1g", "range":"none","expect":"Hello"}
  }
+
+
  
 aiyan@pc100:~/myweb$ nghttpd 8448 -v ./key.pem ./cert.pem -d /var/www/html/
 
