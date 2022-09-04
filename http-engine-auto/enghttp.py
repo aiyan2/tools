@@ -9,7 +9,8 @@ import sys
 import subprocess 
 #import unittest
 
-#@todo: add py unitest frame work with assert: 
+#@todo: add py unitest frame to work with assert: ---> doing myself 
+
 
 class DataTuple(object):
 # http request type
@@ -28,14 +29,13 @@ class Configurations(object):
 
 def mlog (obj):
     print (obj)
-def assertIn (a , b ):
+def assertIn (a,b ):
     #removing newlines
     
     if a in b.strip():
         mlog("\n\n\n@@@@@@@@PASSPASS@@@@@@\n\n\n")
     else:
         mlog("\n\n\n@@@@@@@@FAILFAIL@@@@@@\n\n\n")
-
 
 
 def generate_random_data(length_range):
@@ -52,20 +52,20 @@ def generate_random_data(length_range):
 def handle_random_data_query(conf, tuple):
     no_of_files = int(tuple['no_of_files'])
     for i in range(no_of_files):
-        print(f"\n\nGenerating file no {i} out of {no_of_files}")
+        mlog(f"\n\nGenerating file no {i} out of {no_of_files}")
         filename = "loader_" + str(time.time()) + ".txt"
         file_data = generate_random_data([1 , int(tuple['max_len'])]).encode("utf-8")
-        print(f"file {filename} is read with size {len(file_data)}")
+        mlog(f"file {filename} is read with size {len(file_data)}")
         sent = handle_file_communication(conf, tuple, filename, file_data)
         if sent:
-            print("Randomly generated file sent successfully")
+             mlog("Randomly generated file sent successfully")
         else:
-            print(f"ERROR: file integrity check failed", file=sys.stderr)
+             mlog(f"ERROR: file integrity check failed", file=sys.stderr)
 
 
 ## map args to curl http version            
 def ver_map(conf):
-    print ("conf.httpver:"+conf.httpver)
+    mlog ("conf.httpver:"+conf.httpver)
     if conf.httpver == "2":
         cver = "--http2"
     elif conf.httpver =="1.0":
@@ -89,7 +89,7 @@ def test_run(conf,tuple):
     if conf.proxy:
         pars +=" -x " +conf.proxy 
         pars += auth_map(conf, tuple)+ conf.username +":"+conf.password 
-    print ("curl -k "+pars);
+    mlog ("curl -k "+pars);
 
     p = subprocess.Popen("curl -k  "+pars + " 2>&1", stdout=subprocess.PIPE, shell=True)
     out, err = p.communicate()
@@ -102,13 +102,13 @@ def test_run(conf,tuple):
     #fields = out.split()
     # strand = ''.join(fields)
     #aln = Aln(int(fields[1]), int(fields[2]), fields[3].decode(), int(fields[4]), int(fields[5]))
-    # print ( strand)
+    #  mlog ( strand)
 
     try:  
         assertIn(tuple['expect'],out.decode())         
     except KeyError as e:  
-        print ("missing key:")
-        print (e)
+        mlog ("missing key:")
+        mlog (e)
         pass  
 
    
@@ -129,16 +129,16 @@ def handle_get(conf, tuple):
         if tuple['output'] == 1:
             conf.tmp_pars = ' -o /tmp/http_get_big '        
     except KeyError as e:  
-        print ("missing key:")
-        print (e)
+        mlog ("missing key:")
+        mlog (e)
         pass  
 
     try:  
         if tuple['web_filter'] == 1:            
             conf.uri = "https://www.ibm.com"
     except KeyError as e:  
-        print ("missing key:")
-        print (e)
+        mlog ("missing key:")
+        mlog (e)
         pass  
         
     finally:
@@ -147,8 +147,8 @@ def handle_get(conf, tuple):
         
 def handle_post(conf, tuple):
     mfile = tuple['file_id']
-    print("file is:"+mfile + "& tuple['form_urlencode']")
-    print(tuple['form_urlencode'])
+    mlog("file is:"+mfile + "& tuple['form_urlencode']")
+    mlog(tuple['form_urlencode'])
     if tuple['form_urlencode'] == 0:  # multi-part, it's int of 0
         pars = " -F file=@"+mfile
     else:
@@ -161,10 +161,10 @@ def handle_post(conf, tuple):
 def process_data_tuple(conf, tuple):
     type = tuple['type']
     if type == DataTuple.GET:
-        print(f"http get")
+        mlog(f"http get")
         handle_get(conf, tuple)
     elif type == DataTuple.POST:
-        print(f"http post")
+        mlog(f"http post")
         handle_post(conf, tuple)
 
 
@@ -203,15 +203,15 @@ if __name__ == '__main__':
         counter = 1
         for key, value in zip (data_tuples.keys(), data_tuples.values()):
             #random.seed(args.seed)
-            print(f"\n \nProcessing data tuple of key '{key}' and value \n {value} \n\n")
+            mlog(f"\n \nProcessing data tuple of key '{key}' and value \n {value} \n\n")
             process_data_tuple(conf, value)
 
         # test argus 
-        print (conf.password)
-        print (conf.httpver)
+        mlog (conf.password)
+        mlog (conf.httpver)
     finally:
         # connection.disconnect(True)
-        print("DONE!")
+        mlog("DONE!")
 
 """
 smb@krb5:~/enghttp/mt$ python3 enghttp.py --uri https://172.18.43.100  --username u1 --password 12345678 --data-tuples pc100tuple.txt  --proxy 172.18.43.67:8080 > log
