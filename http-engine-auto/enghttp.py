@@ -152,7 +152,7 @@ def handle_post(conf, tuple):
     if tuple['form_urlencode'] == 0:  # multi-part, it's int of 0
         pars = " -F file=@"+mfile
     else:
-        pars = " -d "+mfile 
+        pars = " -d @"+mfile 
     
 
     conf.tmp_pars = pars      
