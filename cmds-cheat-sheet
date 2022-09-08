@@ -17,4 +17,20 @@ for informer, if not effect,
 # di firewall auth list 
 #dia debug  authd  fsso  clear 
 
+======curl 
+
+-- upload files 
+--- ftp
+curl -u linuxhint@argexchanger.com:YourpasswordHere -T zippedfile4.zip ftp://argexchanger.com
+---- http
+smb@krb5:~/enghttp/mt$ curl -k https://172.18.43.100:8448 --http2 -F file=@./1g -v
+-- by PUT, most servers not allowed 
+curl --upload-file linuxhintfile https://transfer.sh/linuxhintfile
+-- 
+curl -k http://172.18.43.100  -d @/etc/hosts  -H "Content-Type: application/javascript"
+
+
+
+
+
 
