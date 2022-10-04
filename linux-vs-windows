@@ -1,0 +1,15 @@
+===== multiline: \ vs ^
+
+streamtester -ignore-time-drift \
+  -ignore-gaps -wowza -wait-for-target 150s \
+  -media-url http://site.com:1935/something.m3u8 \
+  -rtmp-url rtmp://site.com:1935/something \
+  -profiles 3 \
+  -file file_to_stream.mp4
+ ===== windows   
+  streamtester -ignore-time-drift ^
+  -ignore-gaps -wowza -wait-for-target 150s ^
+  -media-url http://site.com:1935/something.m3u8 ^
+  -rtmp-url rtmp://site.com:1935/something ^
+  -profiles 3 ^
+  -file file_to_stream.mp4
