@@ -2,6 +2,9 @@
 ############### HTTP-SERVER++++++++++++++++++++++
 # doing http by nc
 # while true; do { echo -e 'HTTP/1.1 200 OK\r\nContent-Length: 160\r\n\r\n'; ip addr|grep eth0; } | nc -l 80; done
+# in auto_test docker 
+while true; do { echo -e 'HTTP/1.1 200 OK\r\nContent-Length: 160\r\n\r\n'; ip addr|grep ens192; } | nc -l 80; done
+(length 160 means the whole with ip grepped)
 
 ######## CLIENT
 # curl aws-elastic-ip     # also the port1 of FGT public-ip, or private-ip of port1
